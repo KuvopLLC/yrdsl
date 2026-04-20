@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   Yard Sale — landing page
+   yrdsl.app landing page
    Neutral, minimal, matches the gallery's visual DNA
    ============================================================ */
 
@@ -371,7 +371,7 @@ section { padding: 80px 0; border-top: 1px solid var(--line); }
 }
 
 /* ============================================================
-   How it works — 3 columns, with phone mock
+   How it works. 3 columns, with phone mock
    ============================================================ */
 .how {
   display: grid; grid-template-columns: 1.1fr 1fr;
@@ -750,7 +750,7 @@ section { padding: 80px 0; border-top: 1px solid var(--line); }
 .tp-card .tp-thumb { aspect-ratio: 4/3; overflow: hidden; }
 .tp-card .tp-thumb svg { width: 100%; height: 100%; display: block; }
 
-/* Theme — conservative */
+/* Theme. conservative */
 .theme-stage[data-t="conservative"] { background: #fafaf9; color: #18181b; font-family: "Inter", sans-serif; }
 [data-t="conservative"] .tp-header { margin-bottom: 20px; }
 [data-t="conservative"] .tp-header h3 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
@@ -760,7 +760,7 @@ section { padding: 80px 0; border-top: 1px solid var(--line); }
 [data-t="conservative"] .tp-title { font-size: 13px; font-weight: 500; color: #18181b; margin-bottom: 3px; }
 [data-t="conservative"] .tp-price { font-size: 14px; font-weight: 600; }
 
-/* Theme — artsy */
+/* Theme. artsy */
 .theme-stage[data-t="artsy"] { background: #f3efe8; color: #1b1612; font-family: Georgia, "Cormorant Garamond", serif; }
 [data-t="artsy"] .tp-header { margin-bottom: 28px; }
 [data-t="artsy"] .tp-header h3 { margin: 0; font-size: 26px; font-style: italic; font-weight: 400; letter-spacing: 0.005em; }
@@ -771,7 +771,7 @@ section { padding: 80px 0; border-top: 1px solid var(--line); }
 [data-t="artsy"] .tp-title { font-family: Georgia, serif; font-style: italic; font-size: 15px; margin-bottom: 4px; }
 [data-t="artsy"] .tp-price { font-family: "Inter", sans-serif; font-size: 11px; letter-spacing: 0.12em; color: #4a3f35; }
 
-/* Theme — hip */
+/* Theme. hip */
 .theme-stage[data-t="hip"] { background: #0e0e0e; color: #f4f4f2; font-family: "Inter", sans-serif; }
 [data-t="hip"] .tp-header { margin-bottom: 20px; border-bottom: 2px solid #f4f4f2; padding-bottom: 14px; }
 [data-t="hip"] .tp-header h3 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.03em; text-transform: uppercase; }
@@ -783,7 +783,7 @@ section { padding: 80px 0; border-top: 1px solid var(--line); }
 [data-t="hip"] .tp-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: -0.015em; margin-bottom: 4px; color: #f4f4f2; }
 [data-t="hip"] .tp-price { font-size: 15px; font-weight: 700; color: #d4ff3a; letter-spacing: -0.02em; }
 
-/* Theme — retro */
+/* Theme. retro */
 .theme-stage[data-t="retro"] { background: #f5ead0; color: #2b1d0f; font-family: Georgia, serif; }
 [data-t="retro"] .tp-header { margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid #2b1d0f; }
 [data-t="retro"] .tp-header h3 { margin: 0; font-family: Georgia, serif; font-size: 28px; font-weight: 700; color: #2b1d0f; letter-spacing: 0.005em; }
@@ -1085,7 +1085,7 @@ footer .legal { grid-column: 1 / -1; padding-top: 24px; border-top: 1px solid va
           <div class="step-n">2</div>
           <div>
             <div class="step-h">Mark things reserved, hand stuff off</div>
-            <p class="step-p">When a buyer taps Reserve on your page, you get an email. Or tell Claude — "mark the couch reserved for my neighbor" — and it's done. You pick the time and take cash or Venmo.</p>
+            <p class="step-p">When a buyer taps Reserve on your page, you get an email. Or tell Claude. "mark the couch reserved for my neighbor". and it's done. You pick the time and take cash or Venmo.</p>
           </div>
         </div>
       </div>
@@ -1311,9 +1311,8 @@ footer .legal { grid-column: 1 / -1; padding-top: 24px; border-top: 1px solid va
       <h5>Project</h5>
       <ul>
         <li><a href="https://github.com/mreider/yard-sale">GitHub</a></li>
-        <li><a href="#">Docs</a></li>
-        <li><a href="#">Translations</a></li>
-        <li><a href="#">Changelog</a></li>
+        <li><a href="https://github.com/mreider/yard-sale/releases">Releases</a></li>
+        <li><a href="https://oss.kuvop.com">Kuvop OSS</a></li>
       </ul>
     </div>
     <div>
@@ -1404,7 +1403,7 @@ const chatScripts = {
   ],
   1: [
     { t: "user", html: "my neighbor's gonna buy the couch tomorrow, mark it reserved" },
-    { t: "ai", html: "Done — the couch is now marked <b>Reserved</b>. It'll still show on your sale page but nobody else can claim it." },
+    { t: "ai", html: "Done. the couch is now marked <b>Reserved</b>. It'll still show on your sale page but nobody else can claim it." },
     { t: "user", html: "thx" },
   ]
 };
