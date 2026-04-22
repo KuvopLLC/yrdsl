@@ -221,6 +221,20 @@ h2 {
 .chat .listing .t { font-size: 11px; font-weight: 500; color: var(--ink); }
 .chat .listing .p { font-size: 11px; font-weight: 600; color: var(--ink); }
 
+/* End CTA */
+.cta-end { text-align: center; }
+.cta-end h2 { margin-bottom: 8px; }
+.cta-end p { font-size: 15px; color: var(--ink-2); margin: 0 0 24px; }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px;
+  background: var(--ink); color: var(--bg);
+  border-radius: 8px;
+  font-size: 15px; font-weight: 500;
+  transition: transform .08s, opacity .12s;
+}
+.cta-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+
 /* Footer */
 footer {
   padding: 40px 0 60px;
@@ -340,6 +354,14 @@ footer .links { display: flex; gap: 18px; flex-wrap: wrap; }
 }</code></pre>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="cta-end">
+  <div class="wrap">
+    <h2>Start a sale.</h2>
+    <p>Free during the invite-only beta.</p>
+    <a class="cta-btn" href="https://app.yrdsl.app/signup">Sign up &rarr;</a>
   </div>
 </section>
 
