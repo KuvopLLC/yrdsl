@@ -156,6 +156,8 @@ h2 {
 .path h3 { font-size: 17px; font-weight: 600; margin: 0 0 10px; letter-spacing: -0.01em; }
 .path p { font-size: 14.5px; color: var(--ink-2); margin: 0 0 18px; line-height: 1.6; }
 .path p.prompt-caption { font-size: 13px; color: var(--muted); margin: 0; }
+.path p.prompt-caption a { border-bottom: 1px dotted var(--line-2); transition: color .12s, border-color .12s; }
+.path p.prompt-caption a:hover { color: var(--ink); border-bottom-color: var(--ink); }
 .path .cta {
   margin-top: auto;
   display: inline-flex; align-items: center; gap: 6px;
@@ -339,7 +341,9 @@ footer .links { display: flex; gap: 18px; flex-wrap: wrap; }
             </div>
           </div>
         </div>
-        <p class="prompt-caption">Works with either hosting option.</p>
+        <p class="prompt-caption">
+          Published as <a href="https://www.npmjs.com/package/@yrdsl/mcp" target="_blank" rel="noopener"><code>@yrdsl/mcp</code></a> on npm. Works with either hosting option.
+        </p>
       </div>
       <div class="path">
         <h3>By hand.</h3>
