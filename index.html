@@ -182,17 +182,44 @@ h2 {
 }
 .snippet code { background: none; border: none; padding: 0; font-size: inherit; }
 
-.prompt {
+.chat {
   margin: 0 0 12px;
-  padding: 12px 14px;
-  background: var(--surface-2);
-  border-left: 3px solid var(--ink);
-  border-radius: 0 8px 8px 0;
-  font-size: 14.5px;
-  color: var(--ink);
-  font-style: italic;
-  line-height: 1.55;
+  padding: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex; flex-direction: column; gap: 8px;
+  font-size: 12.5px; line-height: 1.5;
 }
+.chat .bubble { max-width: 88%; padding: 9px 12px; border-radius: 12px; }
+.chat .bubble.u {
+  align-self: flex-end;
+  background: var(--ink); color: var(--bg);
+  border-bottom-right-radius: 3px;
+}
+.chat .bubble.c {
+  align-self: flex-start;
+  background: var(--surface-2); color: var(--ink);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 3px;
+}
+.chat .photos { display: flex; gap: 4px; margin-bottom: 6px; }
+.chat .photos .ph { width: 44px; height: 34px; border-radius: 4px; }
+.chat .ph.bike { background: linear-gradient(135deg, #6b7280, #374151); }
+.chat .ph.lamp { background: linear-gradient(135deg, #a3a3a3, #52525b); }
+.chat .listing {
+  margin-top: 8px;
+  display: flex; gap: 8px; align-items: center;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.chat .listing .thumb { width: 30px; height: 30px; border-radius: 3px; flex-shrink: 0; }
+.chat .listing .thumb.bike { background: linear-gradient(135deg, #6b7280, #374151); }
+.chat .listing .meta { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; }
+.chat .listing .t { font-size: 11px; font-weight: 500; color: var(--ink); }
+.chat .listing .p { font-size: 11px; font-weight: 600; color: var(--ink); }
 
 /* Footer */
 footer {
@@ -253,7 +280,25 @@ footer .links { display: flex; gap: 18px; flex-wrap: wrap; }
         <p>
           Connect over MCP from Claude Desktop and ask it what you'd ask a friend:
         </p>
-        <blockquote class="prompt">Here are photos of stuff I'm selling. Add them to my sale and suggest prices.</blockquote>
+        <div class="chat" aria-hidden="true">
+          <div class="bubble u">
+            <div class="photos">
+              <div class="ph bike"></div>
+              <div class="ph lamp"></div>
+            </div>
+            Here are photos of stuff I'm selling. Add them to my sale and suggest prices.
+          </div>
+          <div class="bubble c">
+            Added 2 items.
+            <div class="listing">
+              <div class="thumb bike"></div>
+              <div class="meta">
+                <div class="t">Vintage road bike, 56cm</div>
+                <div class="p">$320</div>
+              </div>
+            </div>
+          </div>
+        </div>
         <p class="prompt-caption">Works with either hosting option.</p>
       </div>
       <div class="path">
