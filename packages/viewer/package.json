@@ -1,6 +1,6 @@
 {
   "name": "@yrdsl/viewer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "React component that renders a digital yard sale (photos, items, contact buttons). Consumed by yrdsl.app and the yrdsl-self-hosted template.",
   "type": "module",
