@@ -166,16 +166,58 @@
   <code>nginx</code> VM, a USB stick on a lab server. Build locally with
   <code>pnpm install &amp;&amp; pnpm build</code>, then serve <code>dist/</code>.</p>
 
+  <h2>Working with your sale</h2>
+  <p>Regardless of which of the four self-hosted options you picked, you now have a
+  git repository with <code>site.json</code>, <code>items.json</code>, and
+  <code>public/photos/</code>. Two ways to make changes:</p>
+
+  <h3>Manually, in your editor</h3>
+  <p>Clone, edit, preview, push. The host rebuilds automatically on every push (under
+  a minute for all four).</p>
+<pre><code>git clone https://github.com/&lt;you&gt;/&lt;your-repo&gt;.git
+cd &lt;your-repo&gt;
+pnpm install
+pnpm dev                # live preview at http://localhost:5173
+
+# edit site.json and items.json, drop photos in public/photos/
+
+pnpm validate           # catch schema errors before you push
+git add -A
+git commit -m "add toaster"
+git push</code></pre>
+
+  <h3>With Claude (MCP)</h3>
+  <p>The self-hosted template ships an MCP server that talks to your clone on disk.
+  Install it once; after that, talk to Claude.</p>
+<pre><code>cd &lt;your-repo&gt;
+pnpm install
+
+# Claude Code (easiest):
+claude mcp add yrdsl \
+  -e YRDSL_REPO=$(pwd) \
+  -- npx -y @yrdsl/mcp@latest
+
+# Claude Desktop: see the instructions in the template's README.</code></pre>
+  <p>Then ask Claude things like:</p>
+  <ul>
+    <li><em>"Add a Moccamaster coffee maker, $80, photo at ~/Downloads/moccamaster.jpg."</em></li>
+    <li><em>"Draft an item from this Amazon link and add it at 40% off retail."</em></li>
+    <li><em>"Mark the coffee maker reserved for $70."</em></li>
+    <li><em>"Switch the theme to retro, commit, and push."</em></li>
+  </ul>
+  <p>When you ask Claude to commit or push, the MCP runs <code>git commit</code> and
+  <code>git push</code> in your clone. The host sees the push and rebuilds.</p>
+
   <h2>Moving a sale between hosts</h2>
   <p>Every mode reads the same three things: <code>site.json</code>, <code>items.json</code>,
-  and <code>public/photos/</code>. To migrate a sale:</p>
+  and <code>public/photos/</code>. To migrate:</p>
   <ul>
     <li><strong>Hosted → self-hosted:</strong> in the editor's <em>More</em> menu, click
       <strong>Export as ZIP</strong>, drop the files into your fork, push.</li>
     <li><strong>Self-hosted → hosted:</strong> ZIP your <code>site.json</code>,
       <code>items.json</code>, and <code>public/photos/</code> folder, upload it on
       <code>app.yrdsl.app/profile</code> under <em>Import a sale</em>. There's also a
-      <code>pnpm import</code> script in the template that does the reverse.</li>
+      <code>pnpm import</code> script in the template that does the reverse direction.</li>
   </ul>
 
   <a class="back" href="/">← Back to yrdsl.app</a>
