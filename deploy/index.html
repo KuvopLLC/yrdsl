@@ -58,8 +58,18 @@
     The template builds a static Vite project; anywhere that serves static files works.
     Four concrete walkthroughs below — each uses the same <code>site.json</code> +
     <code>items.json</code> + <code>public/photos/</code> under the hood, so you can
-    move between them later. If you'd rather not run any of this, there's
-    <a href="https://app.yrdsl.app/signup">a hosted version</a>.
+    move between them later.
+  </p>
+  <p class="sub" style="margin-bottom: 12px;">
+    <strong style="color: var(--ink-2);">The free tiers on these hosts are real.</strong>
+    A yard sale is a few hundred KB of HTML and a few MB of photos; none of the free
+    plans here will come close to their limits. You don't need to pay any of them.
+  </p>
+  <p class="sub">
+    If you'd rather not run anything yourself, the
+    <a href="https://app.yrdsl.app/signup">hosted version</a> is about $0.10 per sale
+    per month, you get a short URL like <code>yrdsl.app/you/sale</code>, and we handle
+    the hosting, rebuilds, and updates.
   </p>
 
   <h2><span class="num">1.</span> GitHub Pages</h2>
@@ -81,7 +91,7 @@
     Remove the <code>GH_PAGES_BASE</code> env var in <code>.github/workflows/deploy.yml</code>
     so Vite builds with base <code>/</code>.</p>
     <div class="meta">
-      <span><strong>Cost:</strong> free.</span>
+      <span><strong>Cost:</strong> free. Free tier handles any realistic sale.</span>
       <span><strong>Custom domain:</strong> yes, free.</span>
       <span><strong>Claude:</strong> via MCP on a local clone.</span>
     </div>
@@ -105,7 +115,7 @@
     GitHub Pages base-path handling, just leave <code>GH_PAGES_BASE</code> unset —
     Vite defaults to <code>/</code> which is what Vercel wants.</p>
     <div class="meta">
-      <span><strong>Cost:</strong> free on the hobby tier.</span>
+      <span><strong>Cost:</strong> free. Hobby tier handles any realistic sale.</span>
       <span><strong>Custom domain:</strong> yes, free.</span>
       <span><strong>Claude:</strong> via MCP on a local clone.</span>
     </div>
@@ -124,7 +134,7 @@
         under <strong>Domain management</strong>.</li>
     </ol>
     <div class="meta">
-      <span><strong>Cost:</strong> free on the starter tier.</span>
+      <span><strong>Cost:</strong> free. Starter tier handles any realistic sale.</span>
       <span><strong>Custom domain:</strong> yes, free.</span>
       <span><strong>Claude:</strong> via MCP on a local clone.</span>
     </div>
@@ -143,7 +153,7 @@
       <li>Deploy. Custom domain via <strong>Pages project → Custom domains</strong>.</li>
     </ol>
     <div class="meta">
-      <span><strong>Cost:</strong> free, unmetered bandwidth.</span>
+      <span><strong>Cost:</strong> free. Bandwidth is unmetered.</span>
       <span><strong>Custom domain:</strong> yes, free.</span>
       <span><strong>Claude:</strong> via MCP on a local clone.</span>
     </div>
