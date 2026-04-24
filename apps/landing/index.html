@@ -187,6 +187,12 @@ h2 {
   width: 100%;
 }
 @media (max-width: 720px) { .path-centered { max-width: none; } }
+/* Heading above a stacked-centered `.paths` row should line up with the
+   cards, not hang to the far left of the wrap. */
+section:has(.path-centered) h2 {
+  max-width: 620px;
+  margin-inline: auto;
+}
 
 .snippet {
   margin: 0;
