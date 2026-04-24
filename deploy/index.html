@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Deploy · yrdsl.app</title>
+<title>Self-host a yrdsl sale · yrdsl.app</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<meta name="description" content="Four ways to host a yrdsl yard sale: yrdsl.app, GitHub Pages, Vercel, Netlify. Same JSON under the hood so you can move between them." />
+<meta name="description" content="Deploy a yrdsl yard sale to GitHub Pages, Vercel, Netlify, or Cloudflare Pages. All free, all driven by the same JSON files." />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -53,27 +53,16 @@
 </nav>
 
 <div class="wrap">
-  <h1>Deploy a yard sale</h1>
+  <h1>Self-host a yard sale</h1>
   <p class="sub">
-    Four ways to host. Each renders the same <code>SaleSite</code> + <code>SaleItem</code>
-    JSON through the same React viewer, so data moves between them without rewrites.
+    The template builds a static Vite project; anywhere that serves static files works.
+    Four concrete walkthroughs below — each uses the same <code>site.json</code> +
+    <code>items.json</code> + <code>public/photos/</code> under the hood, so you can
+    move between them later. If you'd rather not run any of this, there's
+    <a href="https://app.yrdsl.app/signup">a hosted version</a>.
   </p>
 
-  <h2><span class="num">1.</span> Hosted on yrdsl.app</h2>
-  <div class="card">
-    <p>Sign up with email. The editor is a web app; photos upload in the browser; Claude
-    connects from the <em>Connect Claude</em> tab in one click.</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="https://app.yrdsl.app/signup">Sign up →</a>
-    </div>
-    <div class="meta">
-      <span><strong>Cost:</strong> free during beta, ~$0.10/mo after.</span>
-      <span><strong>Custom domain:</strong> not yet.</span>
-      <span><strong>Claude:</strong> one-click install.</span>
-    </div>
-  </div>
-
-  <h2><span class="num">2.</span> GitHub Pages</h2>
+  <h2><span class="num">1.</span> GitHub Pages</h2>
   <div class="card">
     <p>Free static hosting on <code>github.io</code> (or a custom domain). A GitHub Action
     builds and publishes on every push.</p>
@@ -98,7 +87,7 @@
     </div>
   </div>
 
-  <h2><span class="num">3.</span> Vercel</h2>
+  <h2><span class="num">2.</span> Vercel</h2>
   <div class="card">
     <p>Import the template repo in the Vercel dashboard. No config file needed — Vercel
     detects Vite and builds automatically.</p>
@@ -122,7 +111,7 @@
     </div>
   </div>
 
-  <h2><span class="num">4.</span> Netlify</h2>
+  <h2><span class="num">3.</span> Netlify</h2>
   <div class="card">
     <p>Same idea as Vercel; connect the repo, Netlify detects Vite.</p>
     <ol>
@@ -141,7 +130,7 @@
     </div>
   </div>
 
-  <h2><span class="num">5.</span> Cloudflare Pages</h2>
+  <h2><span class="num">4.</span> Cloudflare Pages</h2>
   <div class="card">
     <p>Cloudflare's equivalent of Vercel/Netlify. Also free, generous bandwidth.</p>
     <ol>
