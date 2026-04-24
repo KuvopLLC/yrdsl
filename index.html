@@ -346,17 +346,7 @@ footer .links { display: flex; gap: 18px; flex-wrap: wrap; }
     <h2>Add and edit items.</h2>
     <div class="paths">
       <div class="path">
-        <h3>Chat with Claude.</h3>
-        <p>
-          Through the MCP, Claude can add items, write descriptions, set prices, and attach photos from a chat. Works on hosted (via API) and self-hosted (via your local repo).
-        </p>
-        <img class="path-shot" src="assets/claude-chat-v3.png" alt="Claude Code session: the user says 'let's use the yrdsl mcp to create a listing for a moccamaster in the Moving Sale sale, here's the image, price it to sell at 80 Euro with brief description.' Claude calls the yrdsl MCP three times and replies 'Listed. Live at yrdsl.app/matt/moving-sale — €80, image attached.'" loading="lazy" />
-        <p class="prompt-caption">
-          Install as a <a href="https://github.com/KuvopLLC/yrdsl/tree/main/plugins/yrdsl" target="_blank" rel="noopener">Claude Code plugin</a>, or wire the <a href="https://www.npmjs.com/package/@yrdsl/mcp" target="_blank" rel="noopener"><code>@yrdsl/mcp</code></a> stdio server into any MCP client.
-        </p>
-      </div>
-      <div class="path">
-        <h3>Or fill in a form.</h3>
+        <h3>Fill in a form.</h3>
         <p>
           On hosted, add items in a web editor: pick a photo, type a title and price, hit save. No JSON, no git, no command line.
         </p>
@@ -365,8 +355,18 @@ footer .links { display: flex; gap: 18px; flex-wrap: wrap; }
           Self-hosted? Edit <code>site.json</code> + <code>items.json</code> in any text editor. Same data shape, so a sale moves between modes without rewrites.
         </p>
       </div>
+      <div class="path">
+        <h3>Or chat with Claude.</h3>
+        <p>
+          Through the MCP, Claude can add items, write descriptions, set prices, and attach photos from a chat. Works on hosted (via API) and self-hosted (via your local repo).
+        </p>
+        <img class="path-shot" src="assets/claude-chat-v3.png" alt="Claude Code session: the user says 'let's use the yrdsl mcp to create a listing for a moccamaster in the Moving Sale sale, here's the image, price it to sell at 80 Euro with brief description.' Claude calls the yrdsl MCP three times and replies 'Listed. Live at yrdsl.app/matt/moving-sale — €80, image attached.'" loading="lazy" />
+        <p class="prompt-caption">
+          Install as a <a href="https://github.com/KuvopLLC/yrdsl/tree/main/plugins/yrdsl" target="_blank" rel="noopener">Claude Code plugin</a>, or wire the <a href="https://www.npmjs.com/package/@yrdsl/mcp" target="_blank" rel="noopener"><code>@yrdsl/mcp</code></a> stdio server into any MCP client.
+        </p>
+      </div>
       <div class="path path-centered">
-        <h3>Or build a bot on top of it.</h3>
+        <h3>Or build a bot.</h3>
         <p>
           The hosted API is a REST endpoint with a bearer token. Wire it to any chat platform and an LLM to manage a sale by message.
         </p>
