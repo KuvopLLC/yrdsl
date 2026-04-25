@@ -36,8 +36,8 @@ action_reason: "negative comment karma — modqueue review"
 type: submission
 author:
     post_karma: "< 2"
-action: comment
 comment_locked: true
+comment_stickied: true
 comment: |
     Welcome to /r/yrdsl!
 
