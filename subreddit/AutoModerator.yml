@@ -39,7 +39,7 @@ author:
 action: comment
 comment_locked: true
 comment: |
-    Welcome to /r/yrdsl! 👋
+    Welcome to /r/yrdsl!
 
     A note on where to ask: if you've hit a **bug in the OSS code**
     (the stuff at github.com/KuvopLLC/yrdsl) it's much easier to track
