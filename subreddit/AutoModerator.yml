@@ -35,7 +35,7 @@ action_reason: "negative comment karma — modqueue review"
 # them at the right place for OSS bugs.
 type: submission
 author:
-    post_karma: "<= 1"
+    post_karma: "< 2"
 action: comment
 comment_locked: true
 comment: |
