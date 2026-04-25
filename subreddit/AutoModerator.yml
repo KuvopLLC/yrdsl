@@ -1,0 +1,85 @@
+# r/yrdsl AutoModerator config.
+#
+# Each `---`-separated block is one rule. AutoModerator evaluates them
+# top-to-bottom; first matching action wins.
+#
+# Apply at: Mod Tools → AutoModerator → Edit config (paste this file).
+# Reddit validates on save; syntax errors will surface there.
+#
+# Documentation: https://www.reddit.com/wiki/automoderator
+
+---
+
+# Filter posts from very young accounts into the modqueue (don't auto-
+# remove). Catches drive-by spam without hurting legit new redditors —
+# a human just needs to glance at the queue before approving.
+type: submission
+author:
+    account_age: "< 7 days"
+action: filter
+action_reason: "young account — modqueue review"
+
+---
+
+# Same idea for accounts with negative comment karma (likely shadow-
+# banned or known troublemakers).
+type: submission
+author:
+    comment_karma: "< -5"
+action: filter
+action_reason: "negative comment karma — modqueue review"
+
+---
+
+# Welcome first-time submitters with a friendly comment that points
+# them at the right place for OSS bugs.
+type: submission
+author:
+    post_karma: "<= 1"
+action: comment
+comment_locked: true
+comment: |
+    Welcome to /r/yrdsl! 👋
+
+    A note on where to ask: if you've hit a **bug in the OSS code**
+    (the stuff at github.com/KuvopLLC/yrdsl) it's much easier to track
+    on a [GitHub issue](https://github.com/KuvopLLC/yrdsl/issues). For
+    everything else — questions about the hosted product, feature
+    requests, "how do I…?", or showing off a sale — you're in the
+    right spot.
+
+    Real humans read every post here. Thanks for trying yrdsl.
+
+---
+
+# Auto-flair posts whose title strongly suggests a bug report.
+type: submission
+title: ['(?i)\b(bug|broken|not working|doesn''t work|isn''t working|error 5\d\d|500 error)\b']
+set_flair: "Bug"
+overwrite_flair: false
+
+---
+
+# Auto-flair feature requests.
+type: submission
+title: ['(?i)\b(feature request|wishlist|would be nice|please add|add support for|can we get)\b']
+set_flair: "Feature request"
+overwrite_flair: false
+
+---
+
+# Auto-flair questions that end with a question mark.
+type: submission
+title: '(?i)\?\s*$'
+set_flair: "Question"
+overwrite_flair: false
+
+---
+
+# Filter link-only posts (no body) into the modqueue. yrdsl posts
+# should always have at least a short description.
+type: submission
+is_self: false
+body (regex): '^\s*$'
+action: filter
+action_reason: "link-only post, no body"
