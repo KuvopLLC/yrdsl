@@ -76,11 +76,11 @@ overwrite_flair: false
 
 ---
 
-# Filter low-effort posts to the modqueue: anything with less than 20
-# characters of body text. Catches link-only posts (link posts have
-# empty body) plus ultra-short self posts ("hi", "test", etc.). A
-# human approves anything legit.
+# Filter posts with no body into the modqueue. Self posts always have
+# body text; link posts arrive with an empty body. A human approves
+# anything legit (e.g. a "look at this sale I made" link post that
+# really is fine on its own).
 type: submission
-body (length, "<"): 20
+body (regex): '^\s*$'
 action: filter
-action_reason: "very short / link-only post — modqueue review"
+action_reason: "empty body — modqueue review"
