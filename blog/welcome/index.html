@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Welcome to the yrdsl blog · yrdsl.app blog</title>
+<title>Why I built yrdsl.app, and why I'm writing about it · yrdsl.app blog</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<meta name="description" content="What this blog is for, what's going to live here, and how to follow along." />
+<meta name="description" content="I'm moving, I'm purging, and I built a digital yard sale to handle it. A note about why this project, and why this blog." />
 <link rel="alternate" type="application/rss+xml" title="yrdsl.app blog" href="/blog/feed.xml" />
 <link rel="canonical" href="https://yrdsl.app/blog/welcome/" />
-<meta property="og:title" content="Welcome to the yrdsl blog" />
-<meta property="og:description" content="What this blog is for, what's going to live here, and how to follow along." />
+<meta property="og:title" content="Why I built yrdsl.app, and why I'm writing about it" />
+<meta property="og:description" content="I'm moving, I'm purging, and I built a digital yard sale to handle it. A note about why this project, and why this blog." />
 <meta property="og:url" content="https://yrdsl.app/blog/welcome/" />
 <meta property="og:type" content="article" />
 <meta property="og:site_name" content="yrdsl.app" />
 <meta property="og:image" content="https://yrdsl.app/assets/hero-gallery.png" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Welcome to the yrdsl blog" />
-<meta name="twitter:description" content="What this blog is for, what's going to live here, and how to follow along." />
+<meta name="twitter:title" content="Why I built yrdsl.app, and why I'm writing about it" />
+<meta name="twitter:description" content="I'm moving, I'm purging, and I built a digital yard sale to handle it. A note about why this project, and why this blog." />
 <meta name="twitter:image" content="https://yrdsl.app/assets/hero-gallery.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -53,31 +53,28 @@
     
     <article>
       <header class="post-header">
-        <h1 class="post-title">Welcome to the yrdsl blog</h1>
+        <h1 class="post-title">Why I built yrdsl.app, and why I'm writing about it</h1>
         <div class="post-meta">
           <time datetime="2026-04-26">April 26, 2026</time>
           <span class="post-tags"><a href="/blog/tags/meta/">meta</a></span>
         </div>
       </header>
-      <div class="post-body"><p>This is the first post on the yrdsl.app blog. Hi.</p>
-<p>I&#39;m building <a href="https://yrdsl.app">yrdsl.app</a> in the open — a digital yard sale you can either run yourself (self-host on GitHub Pages, Vercel, Netlify, or Cloudflare Pages — all free) or let us host for pennies a month. Drop in your photos and Claude writes the listings; share a single short URL; buyers reserve what they want. The whole thing is open source, MIT-licensed, lives at <a href="https://github.com/KuvopLLC/yrdsl">github.com/KuvopLLC/yrdsl</a>.</p>
-<h2>What&#39;s going to live here</h2>
-<p>A few things I want to write about as the project grows:</p>
-<ul>
-<li><strong>Build progress.</strong> Short weekly-ish notes on what shipped, what broke, what I&#39;m learning. Sometimes the post is the changelog; sometimes it&#39;s the story behind one ugly bug.</li>
-<li><strong>Sample sales.</strong> Real yrdsl-built sales from the early users, with notes on what worked and what felt awkward. The plan is for these to double as inspiration when you&#39;re staring at an empty editor.</li>
-<li><strong>How-tos.</strong> Concrete walkthroughs: setting up the <a href="https://github.com/KuvopLLC/yrdsl/tree/main/plugins/yrdsl">Claude Code plugin</a>, self-hosting on each of the four supported platforms, building a WhatsApp bot on top of the API, that kind of thing.</li>
-<li><strong>Behind the curtain.</strong> The architecture, the trade-offs I picked, the things I&#39;d do differently. For developers and curious users who want to understand how the sausage is made.</li>
-</ul>
-<p>There won&#39;t be a posting schedule. I&#39;ll write when there&#39;s something worth saying, not when it&#39;s been a week.</p>
-<h2>How to follow along</h2>
-<ul>
-<li><strong>RSS</strong>: <a href="/blog/feed.xml">feed.xml</a> — drop into Feedly, NetNewsWire, whatever you use.</li>
-<li><strong>Reddit</strong>: <a href="https://www.reddit.com/r/yrdsl/">r/yrdsl</a> — the community sub. New posts get linked there too. It&#39;s also where I listen for feedback on the hosted product.</li>
-<li><strong>GitHub</strong>: <a href="https://github.com/KuvopLLC/yrdsl">KuvopLLC/yrdsl</a> — code, issues, PRs.</li>
-<li><strong>Email</strong>: <a href="mailto:matt@mreider.com">matt@mreider.com</a> for the private stuff.</li>
-</ul>
-<p>If you&#39;ve got a yard sale&#39;s worth of stuff to clear out, <a href="https://app.yrdsl.app/signup">give it a try</a>. Free during pre-release; we read every signup. See you in the next post.</p>
+      <div class="post-body"><p>I usually build software for myself first, and only later think about whether anyone else might want it. That&#39;s the opposite of my day job, where as a PM I spend months getting up to speed on someone else&#39;s product before it starts to feel like mine. The side-project version of me skips that step. I find myself wanting a thing, so I build it.</p>
+<p>Over the last fifteen years I&#39;ve started something close to a hundred projects on GitHub. Almost all of them are deleted or archived. None of them ever fully scratched the itch. I&#39;m never finished building, no matter how much I&#39;ve already built.</p>
+<p>Lately the itch has gotten worse, in scale and scope, because of AI coding tools like Claude Code. The projects I can finish now are more elaborate, with better code and better design, than anything I could finish even five years ago. And so the latest one is this. A digital yard sale.</p>
+<p>The reason for it is concrete. We&#39;re moving out of our place in the 22nd district of Vienna, back to the United States, no fixed destination yet. That means selling, donating, or throwing away basically everything we own. I could use Willhaben (the Austrian Craigslist; nobody here actually uses Craigslist, or eBay), but I wanted everything in one place that I controlled. And I&#39;ll admit the engineer urge was in there too. Surely I can do this better.</p>
+<p>So I built it. And I&#39;m going to use it. Over the next few months I&#39;ll be photographing furniture, kitchen things, and seven years of accumulated whatever, putting it all on the site, and then linking the items into local Facebook groups (Expats in Vienna, that kind of thing). We&#39;ll see how it goes.</p>
+<h2>The flood</h2>
+<p>While I was building, I was also lurking on r/sideproject and r/microsaas. Every day there&#39;s a fresh round of &quot;I built a...&quot; posts. A few of them look like they&#39;re working: actual users, actual paying customers, microSaaS in the literal sense. Most of them just disappear by the next day. The MCP registries are an extreme version of this. I submitted a different project to Glama earlier this year and saw something like ten thousand other entries already in there, less than a year after most of us had even learned what an MCP was.</p>
+<p>The same tools that let me ship faster let everyone ship faster. Throwing together a working web app is now easy. I don&#39;t see that going back.</p>
+<p>A decade ago, building something took months. I&#39;d cold-email a person who might care about it, and they&#39;d often write back. There were fewer projects in the world, so a project from a stranger was worth a few minutes of attention. Now, well, imagine every house on the block running a yard sale on the same Saturday morning. Fewer cars stop. The ones that do don&#39;t stay long.</p>
+<h2>The worry</h2>
+<p>The honest fear is that this is just one of those Saturday yard sales nobody walks into. That there&#39;s nothing here that feels special, because the things that used to make a project feel special (months of work, a rare skill set, simply finishing it at all) don&#39;t filter the way they once did. GitHub has hundreds of millions of repositories now. Product Hunt sees more launches in a week than it used to in a month. I&#39;m probably just another person who built another thing.</p>
+<p>That&#39;s a demotivating place to land, and not just for this project.</p>
+<h2>Two reasons I&#39;m not putting it down</h2>
+<p>The first is that I genuinely like to write. Always have. Even if the audience here ends up being a few siblings and a couple of friends, that&#39;s fine. Code by itself doesn&#39;t tell you why a project exists. A blog can.</p>
+<p>The second is that I&#39;m actually going to use it myself. Not as a demo. Not as a pretend customer. I have a couch, a vacuum, a kitchen table, and seven years of other things to sell in Vienna over the next few months, and the only way I&#39;m going to find the rough edges is by hitting them myself.</p>
+<p>So that&#39;s the deal. I built a thing. I&#39;m using it. And now I&#39;ve blogged about it. :)</p>
 </div>
       <aside class="post-cta">
         <h3>Sell your stuff on yrdsl.</h3>
