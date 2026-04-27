@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
 import de from './locales/de.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -28,8 +28,12 @@ function scanCodeForKeys(): Set<string> {
       const fullPath = join(dir, file.name);
 
       // Skip node_modules, test files, and i18n files themselves
-      if (file.name.startsWith('.') || file.name === 'node_modules' ||
-          file.name === 'locales' || file.name.endsWith('.test.ts')) {
+      if (
+        file.name.startsWith('.') ||
+        file.name === 'node_modules' ||
+        file.name === 'locales' ||
+        file.name.endsWith('.test.ts')
+      ) {
         continue;
       }
 
@@ -41,29 +45,29 @@ function scanCodeForKeys(): Set<string> {
 
           // Match t('key.path', ...) or t("key.path", ...) or tPlural('key.path', ...)
           const tMatches = content.match(/\bt\(['"`]([\w.]+)['"`]/g) || [];
-          tMatches.forEach(m => {
+          for (const m of tMatches) {
             const key = m.match(/['"`]([\w.]+)['"`]/)?.[1];
             if (key) keys.add(key);
-          });
+          }
 
           // Also match t(expr as MessageKey, ...) where expr is a string literal
           const tAsMatches = content.match(/\bt\(['"]([\w.]+)['"] as MessageKey/g) || [];
-          tAsMatches.forEach(m => {
+          for (const m of tAsMatches) {
             const key = m.match(/['"]([\w.]+)['"]/)?.[1];
             if (key) keys.add(key);
-          });
+          }
 
           // tPlural calls use dynamic keys like `${baseKey}_${rule}`
           // but we can look for the base keys referenced
           const tPluralMatches = content.match(/\btPlural\(['"`]([\w.]+)['"`]/g) || [];
-          tPluralMatches.forEach(m => {
+          for (const m of tPluralMatches) {
             const key = m.match(/['"`]([\w.]+)['"`]/)?.[1];
             if (key) {
               // tPlural appends _one, _other, _zero etc based on plural rules
               keys.add(`${key}_one`);
               keys.add(`${key}_other`);
             }
-          });
+          }
         } catch {
           // Skip files that can't be read
         }
@@ -82,7 +86,7 @@ describe('i18n: translation coverage', () => {
     Object.entries(LOCALES).map(([locale, catalog]) => [
       locale,
       new Set(Object.keys(catalog as Record<string, unknown>)),
-    ])
+    ]),
   );
 
   it('all keys in code have translations in all locales', () => {
@@ -102,18 +106,18 @@ describe('i18n: translation coverage', () => {
         .map(([key, locales]) => `  ${key}: missing in ${locales.join(', ')}`)
         .join('\n');
       expect.fail(
-        `Missing translations:\n${report}\n\nAdd them to packages/viewer/src/locales/{locale}.json`
+        `Missing translations:\n${report}\n\nAdd them to packages/viewer/src/locales/{locale}.json`,
       );
     }
   });
 
   it('all keys in locales are used in code', () => {
-    const unused = enKeys.filter(key => !codeKeys.has(key));
+    const unused = enKeys.filter((key) => !codeKeys.has(key));
 
     if (unused.length > 0) {
-      const report = unused.map(key => `  ${key}`).join('\n');
+      const report = unused.map((key) => `  ${key}`).join('\n');
       expect.fail(
-        `Unused translation keys in en.json:\n${report}\n\nRemove them or add code that uses them.`
+        `Unused translation keys in en.json:\n${report}\n\nRemove them or add code that uses them.`,
       );
     }
   });
@@ -125,14 +129,14 @@ describe('i18n: translation coverage', () => {
     for (const [locale, keys] of allLocaleKeys) {
       if (locale === 'en') continue;
 
-      const missing = enKeys.filter(k => !keys.has(k));
-      const extra = Array.from(keys).filter(k => !enSet.has(k));
+      const missing = enKeys.filter((k) => !keys.has(k));
+      const extra = Array.from(keys).filter((k) => !enSet.has(k));
 
       if (missing.length > 0) {
-        issues.push(`${locale}: missing keys ${missing.map(k => `'${k}'`).join(', ')}`);
+        issues.push(`${locale}: missing keys ${missing.map((k) => `'${k}'`).join(', ')}`);
       }
       if (extra.length > 0) {
-        issues.push(`${locale}: extra keys ${extra.map(k => `'${k}'`).join(', ')}`);
+        issues.push(`${locale}: extra keys ${extra.map((k) => `'${k}'`).join(', ')}`);
       }
     }
 
