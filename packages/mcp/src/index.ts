@@ -78,6 +78,17 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  // Friendly banner on stderr — visible in the MCP host's logs (Claude
+  // Desktop ~/Library/Logs/Claude/, Claude Code's mcp logs, etc.) and
+  // direct in the terminal when run interactively. Stdout stays the
+  // pure JSON-RPC stream the host expects.
+  process.stderr.write(
+    [
+      `yrdsl-mcp ${VERSION} ready (${backend.mode})`,
+      'Need help, or want to share feedback? https://www.reddit.com/r/yrdsl/',
+    ].join('\n') + '\n',
+  );
+
   const server = new Server(
     { name: 'yrdsl-mcp', version: VERSION },
     { capabilities: { tools: {} } },

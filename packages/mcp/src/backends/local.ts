@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { decodeImageData } from './hosted.js';
+import { normalizeImage } from './image-normalize.js';
 import type {
   AddItemInput,
   Backend,
@@ -169,8 +170,10 @@ export class LocalFileBackend implements Backend {
     const idx = this.findIdx(items, id);
     const item = items[idx] as SaleItem;
 
-    const { bytes, ext } = await fetchImageBytes(url);
-    const relPath = this.writePhoto(id, bytes, ext);
+    const { bytes: rawBytes, mime: rawMime } = await fetchImageBytes(url);
+    const { bytes, mime } = await normalizeImage(rawBytes, rawMime);
+    const ext = LOCAL_MIME_EXTS[mime] ?? 'bin';
+    const relPath = this.writePhoto(id, Buffer.from(bytes), ext);
 
     const next: SaleItem = {
       ...item,
@@ -191,9 +194,10 @@ export class LocalFileBackend implements Backend {
     const idx = this.findIdx(items, id);
     const item = items[idx] as SaleItem;
 
-    const { bytes, mime } = decodeImageData(data, opts.mime);
+    const { bytes: rawBytes, mime: rawMime } = decodeImageData(data, opts.mime);
+    const { bytes, mime } = await normalizeImage(rawBytes, rawMime);
     const ext = LOCAL_MIME_EXTS[mime] ?? 'bin';
-    const relPath = this.writePhoto(id, bytes, ext);
+    const relPath = this.writePhoto(id, Buffer.from(bytes), ext);
 
     const next: SaleItem = {
       ...item,
@@ -225,14 +229,15 @@ export class LocalFileBackend implements Backend {
       );
     }
     const buf = readFileSync(path);
-    const mime = detectLocalImageMime(buf);
-    if (!mime) {
+    const rawMime = detectLocalImageMime(buf);
+    if (!rawMime) {
       throw new Error(
         `attach_image_from_path: "${path}" isn't a JPEG, PNG, or WebP (magic bytes).`,
       );
     }
+    const { bytes, mime } = await normalizeImage(buf, rawMime);
     const ext = LOCAL_MIME_EXTS[mime] ?? 'bin';
-    const relPath = this.writePhoto(id, buf, ext);
+    const relPath = this.writePhoto(id, Buffer.from(bytes), ext);
     const next: SaleItem = {
       ...item,
       images: [...(item.images ?? (item.image ? [item.image] : [])), relPath],
@@ -278,6 +283,24 @@ export class LocalFileBackend implements Backend {
     return this.withItemUrl(next);
   }
 
+  async setCover(id: string, imageUrl: string, _sale?: string): Promise<SaleItem> {
+    const items = this.readJson<SaleItem[]>(this.itemsPath);
+    const idx = this.findIdx(items, id);
+    const item = items[idx] as SaleItem;
+    const existing = item.images ?? (item.image ? [item.image] : []);
+    if (!existing.includes(imageUrl)) {
+      throw new Error(
+        `Image "${imageUrl}" is not on item "${id}". Attach it first, or pass a URL that's already in item.images.`,
+      );
+    }
+    if (existing[0] === imageUrl) return this.withItemUrl(item);
+    const reordered = [imageUrl, ...existing.filter((u) => u !== imageUrl)];
+    const next: SaleItem = { ...item, images: reordered, image: undefined };
+    items[idx] = next;
+    this.writeJson(this.itemsPath, items);
+    return this.withItemUrl(next);
+  }
+
   /** Write bytes into `public/photos/` and return the repo-relative path. */
   private writePhoto(itemId: string, bytes: Uint8Array | Buffer, ext: string): string {
     const photosDir = join(this.repoDir, 'public', 'photos');
@@ -306,7 +329,7 @@ export class LocalFileBackend implements Backend {
     );
   }
   async commitAndPush(message?: string): Promise<{ pushed: boolean; note?: string }> {
-    const msg = message ?? 'update yard sale';
+    const msg = message ?? 'update digital yard sale';
     this.runGit(['add', '-A']);
     const status = this.runGit(['status', '--porcelain']).stdout;
     if (!status.trim()) return { pushed: false, note: 'Nothing to commit.' };
@@ -424,7 +447,9 @@ function detectLocalImageMime(buf: Uint8Array): string | null {
  * that the hosted endpoint has doesn't apply. Still reject non-http(s)
  * schemes (no file://) and enforce a sane size cap.
  */
-async function fetchImageBytes(rawUrl: string): Promise<{ bytes: Buffer; ext: string }> {
+async function fetchImageBytes(
+  rawUrl: string,
+): Promise<{ bytes: Buffer; mime: string; ext: string }> {
   let url: URL;
   try {
     url = new URL(rawUrl);
@@ -453,5 +478,5 @@ async function fetchImageBytes(rawUrl: string): Promise<{ bytes: Buffer; ext: st
   if (arr.byteLength > LOCAL_IMAGE_MAX_BYTES) {
     throw new Error(`Image too large: ${arr.byteLength} bytes (max ${LOCAL_IMAGE_MAX_BYTES}).`);
   }
-  return { bytes: Buffer.from(arr), ext };
+  return { bytes: Buffer.from(arr), mime, ext };
 }

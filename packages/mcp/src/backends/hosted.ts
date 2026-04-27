@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import { normalizeImage } from './image-normalize.js';
 import type {
   AddItemInput,
   Backend,
@@ -181,7 +182,8 @@ export class HostedApiBackend implements Backend {
     );
     const t0 = Date.now();
     const id = await this.resolveSale(sale);
-    const { bytes, mime } = decodeImageData(data, opts.mime);
+    const { bytes: rawBytes, mime: rawMime } = decodeImageData(data, opts.mime);
+    const { bytes, mime } = await normalizeImage(rawBytes, rawMime);
     log(`POST /images/bytes (${bytes.byteLength} bytes, ${mime})`);
     const { item } = await this.fetchRaw<{ item: SaleItem }>(
       `/sales/${id}/items/${itemId}/images/bytes`,
@@ -195,8 +197,9 @@ export class HostedApiBackend implements Backend {
     log(`attach_image_from_path start: item=${itemId} path=${path}`);
     const t0 = Date.now();
     const id = await this.resolveSale(sale);
-    const { bytes, mime } = readLocalImage(path);
-    log(`read ${bytes.byteLength} bytes from ${path} (${mime})`);
+    const { bytes: rawBytes, mime: rawMime } = readLocalImage(path);
+    log(`read ${rawBytes.byteLength} bytes from ${path} (${rawMime})`);
+    const { bytes, mime } = await normalizeImage(rawBytes, rawMime);
     const { item } = await this.fetchRaw<{ item: SaleItem }>(
       `/sales/${id}/items/${itemId}/images/bytes`,
       { method: 'POST', body: bytes, contentType: mime },
@@ -210,6 +213,24 @@ export class HostedApiBackend implements Backend {
     const path = `/sales/${id}/items/${itemId}/images?url=${encodeURIComponent(imageUrl)}`;
     await this.fetch(path, { method: 'DELETE' });
     return this.getItem(itemId, sale);
+  }
+
+  async setCover(itemId: string, imageUrl: string, sale?: string): Promise<SaleItem> {
+    const id = await this.resolveSale(sale);
+    const current = await this.getItem(itemId, sale);
+    const existing = current.images ?? (current.image ? [current.image] : []);
+    if (!existing.includes(imageUrl)) {
+      throw new Error(
+        `Image "${imageUrl}" is not on item "${itemId}". Attach it first, or pass a URL that's already in item.images.`,
+      );
+    }
+    if (existing[0] === imageUrl) return current;
+    const reordered = [imageUrl, ...existing.filter((u) => u !== imageUrl)];
+    const { item } = await this.fetch<{ item: SaleItem }>(`/sales/${id}/items/${itemId}`, {
+      method: 'PATCH',
+      body: { images: reordered },
+    });
+    return item;
   }
 
   // ─── Mode-specific ─────────────────────────────────────────────────────

@@ -1,11 +1,19 @@
 import type { SaleItem, SaleSite } from '@yrdsl/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { LOCALE_NAMES, SUPPORTED_LOCALES, detectLocale, t, tPlural } from './i18n';
 
 export interface SaleViewerProps {
   site: SaleSite;
   items: SaleItem[];
   /** Locale suffix, e.g. "de" → reads `siteName_de` / `subtitle_de` from site. */
   locale?: string;
+  /**
+   * When the page URL is a path-based item deep-link (e.g.
+   * /matt/moving-sale/moccamaster-select-coffee-maker), pass the third
+   * segment in here so the modal opens on first paint without a flash
+   * of the grid. Takes precedence over the legacy `#item-id` hash.
+   */
+  initialItemSlug?: string;
 }
 
 function makeMoneyFormatter(currency: string, locale: string) {
@@ -34,30 +42,79 @@ function localized<T>(site: SaleSite, field: string, locale?: string): T | undef
   return s[field] as T | undefined;
 }
 
-export function SaleViewer({ site, items, locale }: SaleViewerProps) {
+function LanguagePicker({ locale, onChange }: { locale: string; onChange: (l: string) => void }) {
+  return (
+    <select
+      className="lang-picker"
+      value={locale}
+      onChange={(e) => onChange(e.target.value)}
+      aria-label="Language"
+    >
+      {SUPPORTED_LOCALES.map((l) => (
+        <option key={l} value={l}>
+          {LOCALE_NAMES[l] ?? l}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+export function SaleViewer({ site, items, locale, initialItemSlug }: SaleViewerProps) {
+  const [activeLocale, setActiveLocale] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem('yrdsl-locale');
+      if (stored && SUPPORTED_LOCALES.includes(stored)) return stored;
+    } catch {}
+    return locale ?? detectLocale();
+  });
   const [q, setQ] = useState('');
   const [sort, setSort] = useState<SortKey>('newest');
   const [hideReserved, setHideReserved] = useState(true);
   const [onlyReserved, setOnlyReserved] = useState(false);
   const [activeTags, setActiveTags] = useState<string[]>([]);
-  const [openItem, setOpenItem] = useState<SaleItem | null>(null);
+  const [openItem, setOpenItem] = useState<SaleItem | null>(() => {
+    // Synchronous initial-state fn so the modal is open on first paint
+    // when the URL is a path-based item deep-link (no flash of grid).
+    if (initialItemSlug) {
+      return items.find((i) => i.slug === initialItemSlug) ?? null;
+    }
+    return null;
+  });
 
-  // Deep-link support: #item-id opens that item.
+  // Path-based deep-link prop changes (rare — happens if the host
+  // navigates client-side between item URLs without a remount).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only re-run when slug changes
   useEffect(() => {
+    if (!initialItemSlug) return;
+    const found = items.find((i) => i.slug === initialItemSlug);
+    if (found) setOpenItem(found);
+  }, [initialItemSlug]);
+
+  // Legacy hash deep-link (#item-id). Skipped when the host already
+  // gave us a path-based slug, otherwise the hash would clobber it.
+  useEffect(() => {
+    if (initialItemSlug) return;
     const hash = window.location.hash.replace('#', '');
     if (hash) {
       const found = items.find((i) => i.id === hash);
       if (found) setOpenItem(found);
     }
-  }, [items]);
+  }, [items, initialItemSlug]);
 
+  // Mirror the open item into the URL so refreshes keep state and
+  // copy-link gets the right form. Path-based when the host is using
+  // it (initialItemSlug truthy), otherwise legacy hash.
   useEffect(() => {
+    if (initialItemSlug !== undefined) {
+      // Path-mode: caller is in charge of routing. We don't push history.
+      return;
+    }
     if (openItem) {
       history.replaceState(null, '', `#${openItem.id}`);
     } else if (window.location.hash) {
       history.replaceState(null, '', window.location.pathname);
     }
-  }, [openItem]);
+  }, [openItem, initialItemSlug]);
 
   const allTags = useMemo(() => {
     const s = new Set<string>();
@@ -110,12 +167,19 @@ export function SaleViewer({ site, items, locale }: SaleViewerProps) {
   const toggleTag = (t: string) =>
     setActiveTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
 
+  function switchLocale(l: string) {
+    setActiveLocale(l);
+    try {
+      localStorage.setItem('yrdsl-locale', l);
+    } catch {}
+  }
+
   const siteName = localized<string>(site, 'siteName', locale) ?? '';
   const subtitle = localized<string>(site, 'subtitle', locale) ?? '';
   const location = localized<string>(site, 'location', locale) ?? '';
   const money = useMemo(
-    () => makeMoneyFormatter(site.currency ?? 'USD', locale ?? site.language ?? 'en'),
-    [site.currency, site.language, locale],
+    () => makeMoneyFormatter(site.currency ?? 'USD', activeLocale),
+    [site.currency, activeLocale],
   );
 
   return (
@@ -130,9 +194,12 @@ export function SaleViewer({ site, items, locale }: SaleViewerProps) {
               {location}
             </span>
           </div>
-          <div className="stats">
-            <b>{available}</b> available · <b>{reservedCount}</b> reserved · <b>{items.length}</b>{' '}
-            total
+          <div className="header-right">
+            <div className="stats">
+              <b>{available}</b> available · <b>{reservedCount}</b> reserved · <b>{items.length}</b>{' '}
+              total
+            </div>
+            <LanguagePicker locale={activeLocale} onChange={switchLocale} />
           </div>
         </div>
       </header>
@@ -146,6 +213,7 @@ export function SaleViewer({ site, items, locale }: SaleViewerProps) {
         setHideReserved={setHideReserved}
         onlyReserved={onlyReserved}
         setOnlyReserved={setOnlyReserved}
+        locale={activeLocale}
       />
 
       {allTags.length > 0 && (
@@ -154,17 +222,22 @@ export function SaleViewer({ site, items, locale }: SaleViewerProps) {
           active={activeTags}
           onToggle={toggleTag}
           onClear={() => setActiveTags([])}
+          locale={activeLocale}
         />
       )}
 
       <main className="grid">
         {filtered.length === 0 ? (
-          <div className="empty">
-            Nothing matches. Try clearing filters or toggling "Hide reserved" off.
-          </div>
+          <div className="empty">{t('empty.no_results', activeLocale)}</div>
         ) : (
           filtered.map((item) => (
-            <Card key={item.id} item={item} onOpen={setOpenItem} money={money} />
+            <Card
+              key={item.id}
+              item={item}
+              onOpen={setOpenItem}
+              money={money}
+              locale={activeLocale}
+            />
           ))
         )}
       </main>
@@ -174,11 +247,19 @@ export function SaleViewer({ site, items, locale }: SaleViewerProps) {
           {siteName}
           {location ? ` · ${location}` : ''}
         </span>
-        <span>Updated {items[0]?.added ?? 'just now'}</span>
+        <span>
+          {t('footer.updated', activeLocale)} {items[0]?.added ?? 'just now'}
+        </span>
       </footer>
 
       {openItem && (
-        <Modal item={openItem} site={site} money={money} onClose={() => setOpenItem(null)} />
+        <Modal
+          item={openItem}
+          site={site}
+          money={money}
+          onClose={() => setOpenItem(null)}
+          locale={activeLocale}
+        />
       )}
     </div>
   );
@@ -193,6 +274,7 @@ interface ControlsProps {
   setHideReserved: (v: boolean) => void;
   onlyReserved: boolean;
   setOnlyReserved: (v: boolean) => void;
+  locale: string;
 }
 
 function Controls(p: ControlsProps) {
@@ -200,7 +282,7 @@ function Controls(p: ControlsProps) {
     <div className="controls">
       <div className="search-wrap">
         <input
-          placeholder="Search title, description, tags…"
+          placeholder={t('filter.search', p.locale)}
           value={p.q}
           onChange={(e) => p.setQ(e.target.value)}
         />
@@ -210,10 +292,10 @@ function Controls(p: ControlsProps) {
         value={p.sort}
         onChange={(e) => p.setSort(e.target.value as SortKey)}
       >
-        <option value="newest">Newest first</option>
-        <option value="oldest">Oldest first</option>
-        <option value="price-asc">Price: low to high</option>
-        <option value="price-desc">Price: high to low</option>
+        <option value="newest">{t('sort.newest', p.locale)}</option>
+        <option value="oldest">{t('sort.oldest', p.locale)}</option>
+        <option value="price-asc">{t('sort.price_asc', p.locale)}</option>
+        <option value="price-desc">{t('sort.price_desc', p.locale)}</option>
       </select>
       <label className="toggle">
         <input
@@ -225,7 +307,7 @@ function Controls(p: ControlsProps) {
           }}
         />
         <span className="dot" />
-        <span className="lbl">Hide reserved</span>
+        <span className="lbl">{t('filter.hide_reserved', p.locale)}</span>
       </label>
       <label className="toggle">
         <input
@@ -237,7 +319,7 @@ function Controls(p: ControlsProps) {
           }}
         />
         <span className="dot" />
-        <span className="lbl">Only reserved</span>
+        <span className="lbl">{t('filter.only_reserved', p.locale)}</span>
       </label>
     </div>
   );
@@ -248,11 +330,13 @@ function TagChips({
   active,
   onToggle,
   onClear,
+  locale,
 }: {
   tags: string[];
   active: string[];
   onToggle: (t: string) => void;
   onClear: () => void;
+  locale: string;
 }) {
   return (
     <div className="chip-row">
@@ -268,7 +352,7 @@ function TagChips({
       ))}
       {active.length > 0 && (
         <button type="button" className="chip clear" onClick={onClear}>
-          clear tags
+          {t('filter.clear_tags', locale)}
         </button>
       )}
     </div>
@@ -290,10 +374,12 @@ function Card({
   item,
   onOpen,
   money,
+  locale,
 }: {
   item: SaleItem;
   onOpen: (i: SaleItem) => void;
   money: (n: number) => string;
+  locale: string;
 }) {
   const reserved = !!item.reserved;
   const imgs = imagesOf(item);
@@ -306,10 +392,12 @@ function Card({
       }}
     >
       <div className="thumb">
-        {reserved && <span className="badge reserved-badge badge-abs">Reserved</span>}
+        {reserved && (
+          <span className="badge reserved-badge badge-abs">{t('item.reserved', locale)}</span>
+        )}
         {imgs[0] && <img src={imgs[0]} alt={item.title} loading="lazy" />}
         {imgs.length > 1 && (
-          <span className="photo-count" aria-label={`${imgs.length} photos`}>
+          <span className="photo-count" aria-label={tPlural('item.photos', imgs.length, locale)}>
             <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
               <path
                 fill="none"
@@ -353,11 +441,13 @@ function Modal({
   site,
   money,
   onClose,
+  locale,
 }: {
   item: SaleItem;
   site: SaleSite;
   money: (n: number) => string;
   onClose: () => void;
+  locale: string;
 }) {
   const [copied, setCopied] = useState(false);
   const imgs = imagesOf(item);
@@ -416,20 +506,49 @@ function Modal({
   const contact = site.contact;
 
   function share() {
-    const url = `${window.location.origin}${window.location.pathname}#${item.id}`;
+    // Prefer the path-based item URL so social-card crawlers (Facebook,
+    // Twitter, LinkedIn, iMessage) hit a server-rendered page with
+    // item-specific Open Graph tags. The pathname might already be an
+    // item URL (3 segments) if the user navigated here via path-based
+    // deep-link — strip back to /user/sale before appending. Falls
+    // back to the legacy hash form on items without a slug.
+    const origin = window.location.origin;
+    const segs = window.location.pathname.split('/').filter(Boolean);
+    const saleBase = `/${segs.slice(0, 2).join('/')}`;
+    const url = item.slug ? `${origin}${saleBase}/${item.slug}` : `${origin}${saleBase}#${item.id}`;
     navigator.clipboard?.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   }
 
+  const priceBlock = (
+    <div className="price-block">
+      {reserved && item.reserved ? (
+        <>
+          <span className="num strike">{money(item.price)}</span>
+          <span className="num">{money(item.reserved.price)}</span>
+        </>
+      ) : (
+        <span className="num">{money(item.price)}</span>
+      )}
+    </div>
+  );
+
   return (
     <div className="scrim" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="close" onClick={onClose} aria-label="Close">
+        <button
+          type="button"
+          className="close"
+          onClick={onClose}
+          aria-label={t('modal.close', locale)}
+        >
           ×
         </button>
         <div className="image" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-          {reserved && <span className="badge reserved-badge badge-abs">Reserved</span>}
+          {reserved && (
+            <span className="badge reserved-badge badge-abs">{t('item.reserved', locale)}</span>
+          )}
           {imgs[imgIdx] && <img src={imgs[imgIdx]} alt={item.title} />}
           {imgs.length > 1 && (
             <>
@@ -437,7 +556,7 @@ function Modal({
                 type="button"
                 className="carousel-nav carousel-prev"
                 onClick={prev}
-                aria-label="Previous photo"
+                aria-label={t('modal.prev', locale)}
               >
                 ‹
               </button>
@@ -445,18 +564,22 @@ function Modal({
                 type="button"
                 className="carousel-nav carousel-next"
                 onClick={next}
-                aria-label="Next photo"
+                aria-label={t('modal.next', locale)}
               >
                 ›
               </button>
-              <div className="carousel-dots" role="tablist" aria-label="Photo selector">
+              <div
+                className="carousel-dots"
+                role="tablist"
+                aria-label={t('modal.selector', locale)}
+              >
                 {imgs.map((url, i) => (
                   <button
                     key={url}
                     type="button"
                     className={`carousel-dot${i === imgIdx ? ' active' : ''}`}
                     onClick={() => setImgIdx(i)}
-                    aria-label={`Photo ${i + 1} of ${imgs.length}`}
+                    aria-label={t('modal.photo_of', locale, { current: i + 1, total: imgs.length })}
                     aria-selected={i === imgIdx}
                     role="tab"
                   />
@@ -467,34 +590,27 @@ function Modal({
         </div>
         <div className="content">
           <h2>{item.title}</h2>
-          <div className="price-block">
-            {reserved && item.reserved ? (
-              <>
-                <span className="num strike">{money(item.price)}</span>
-                <span className="num">{money(item.reserved.price)}</span>
-              </>
-            ) : (
-              <span className="num">{money(item.price)}</span>
-            )}
-          </div>
+          {priceBlock}
           {item.description && <div className="desc">{item.description}</div>}
           <div className="meta">
             <span>
-              <b>Listed</b> {item.added}
+              <b>{t('modal.listed', locale)}</b> {item.added}
             </span>
             {item.tags.length > 0 && (
               <span>
-                <b>Tags</b> {item.tags.join(', ')}
+                <b>{t('modal.tags', locale)}</b> {item.tags.join(', ')}
               </span>
             )}
           </div>
           <div className="share-row">
-            <span>Share:</span>
+            <span>{t('share.label', locale)}</span>
             <button type="button" onClick={share}>
-              {copied ? '✓ Link copied' : 'Copy link'}
+              {copied ? `✓ ${t('share.copied', locale)}` : t('share.copy', locale)}
             </button>
           </div>
-          {!reserved && contact && <ContactBlock item={item} contact={contact} money={money} />}
+          {!reserved && contact && (
+            <ContactBlock item={item} contact={contact} money={money} locale={locale} />
+          )}
         </div>
       </div>
     </div>
@@ -505,27 +621,29 @@ function ContactBlock({
   item,
   contact,
   money,
+  locale,
 }: {
   item: SaleItem;
   contact: { email?: string; sms?: string; whatsapp?: string };
   money: (n: number) => string;
+  locale: string;
 }) {
   const subject = encodeURIComponent(`Re: ${item.title}`);
   const body = encodeURIComponent(
-    `Hi, I'd like to grab the ${item.title} (${money(item.price)}).\nWhen's a good pickup time?`,
+    t('contact.body', locale, { title: item.title, price: money(item.price) }),
   );
   return (
     <div className="form">
-      <h3>Want it? Reach out directly.</h3>
+      <h3>{t('contact.title', locale)}</h3>
       <div className="contact-row">
         {contact.email && (
           <a className="btn" href={`mailto:${contact.email}?subject=${subject}&body=${body}`}>
-            Email
+            {t('contact.email', locale)}
           </a>
         )}
         {contact.sms && (
           <a className="btn" href={`sms:${contact.sms}?body=${body}`}>
-            Text
+            {t('contact.sms', locale)}
           </a>
         )}
         {contact.whatsapp && (
@@ -537,7 +655,7 @@ function ContactBlock({
             target="_blank"
             rel="noreferrer"
           >
-            WhatsApp
+            {t('contact.whatsapp', locale)}
           </a>
         )}
       </div>

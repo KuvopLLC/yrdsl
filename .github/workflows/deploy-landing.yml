@@ -24,12 +24,38 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install workspace deps
+        # Only the landing's deps are needed (marked + js-yaml). pnpm
+        # install respects the workspace; --frozen-lockfile keeps CI
+        # honest about lockfile drift.
+        run: pnpm install --frozen-lockfile
+      - name: Build blog (markdown → HTML, inject latest-posts strip)
+        run: pnpm --filter @yrdsl/landing build
+      - name: Run blog build tests
+        run: pnpm --filter @yrdsl/landing test
       - name: Write CNAME
         run: echo "yrdsl.app" > apps/landing/CNAME
+      - name: Strip blog .gitignore so generated HTML is published
+        # apps/landing/blog/.gitignore exists for local dev only — it
+        # keeps generated index.html / <slug>/ / tags/ / feed.xml out
+        # of source control. peaceiris uses git from inside publish_dir
+        # so any .gitignore in there silently filters the publish too.
+        # Wipe it just before publish.
+        run: rm -f apps/landing/blog/.gitignore
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: apps/landing
           publish_branch: gh-pages
           cname: yrdsl.app
+          # peaceiris's defaults already exclude .git/.github. Add the
+          # ones specific to this publish: pnpm artifacts that ride
+          # along inside apps/landing/, and blog source files we don't
+          # want shipped (only the generated HTML should be public).
+          exclude_assets: 'node_modules,package.json,pnpm-lock.yaml,blog/_src,blog/_build.mjs,blog/_build.test.mjs'
           commit_message: "Deploy landing: ${{ github.event.head_commit.message }}"
